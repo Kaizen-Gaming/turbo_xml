@@ -53,4 +53,22 @@ defmodule TurboXmlTest do
     xml_bin = :erlang.iolist_to_binary(xml)
     assert xml_bin === "<node id=\"me!\" class=\"ftou\"></node>"
   end
+
+  test "xml not valid name" do
+    assert_raise RuntimeError, fn ->
+      node "xml" do  end
+    end
+    assert_raise RuntimeError, fn ->
+      node "2xml" do  end
+    end
+    assert_raise RuntimeError, fn ->
+      node "john kennedy" do  end
+    end
+
+  end
+
+  test "xml valid name1", do: (node "axml" do end)
+  test "xml valid name2", do: (node "_xml" do end)
+  test "xml valid name3", do: (node "_1" do end)
+
 end
