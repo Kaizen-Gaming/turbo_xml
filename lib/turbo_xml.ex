@@ -44,7 +44,7 @@ defmodule TurboXml do
   defp string_escape("<" <> rest), do: ["&lt;" | string_escape(rest)]
   defp string_escape(">" <> rest), do: ["&gt;" | string_escape(rest)]
   defp string_escape("&" <> rest), do: ["&amp;" | string_escape(rest)]
-  defp string_escape(<<other :: utf8, `rest :: binary>>), do: [other | string_escape(rest)]
+  defp string_escape(<<other :: utf8, rest :: binary>>), do: [other | string_escape(rest)]
   defp string_escape(""), do: []
 
   def validate_tag_prefix(<<x :: utf8, m :: utf8, l :: utf8, _rest :: binary>>)
