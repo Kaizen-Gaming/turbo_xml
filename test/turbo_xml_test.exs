@@ -34,6 +34,16 @@ defmodule TurboXmlTest do
     assert xml_bin === "<?xml version=\"1.0\"?><nilTest></nilTest>"
   end
 
+  test "self closing tag" do
+    xml_bin = TurboXml.node("self_closing") |> IO.iodata_to_binary()
+    assert xml_bin === "<self_closing/>"
+  end
+
+  test "self closing tag with attributes" do
+    xml_bin = TurboXml.node("self_closing", id: "tag") |> IO.iodata_to_binary()
+    assert xml_bin === "<self_closing id=\"tag\"/>"
+  end
+
   test "bad xml" do
     xml = node "bad" do
       "<iambad&&\"yo'>"
@@ -64,7 +74,6 @@ defmodule TurboXmlTest do
     assert_raise RuntimeError, fn ->
       node "john kennedy" do  end
     end
-
   end
 
   test "xml handle integer" do
