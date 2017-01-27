@@ -17,7 +17,7 @@ defmodule TurboXml do
 
   def write_node_attrs([]), do: []
   def write_node_attrs([{key, val} | rest]) do
-    [" ", normalize_name(key), "=\"", string_escape(val), "\"" | write_node_attrs(rest)]
+    [" ", normalize_name(key), "=\"", val |> to_string() |> string_escape(), "\"" | write_node_attrs(rest)]
   end
 
   def write_node_body(nil), do: []

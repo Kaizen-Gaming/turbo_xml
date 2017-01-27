@@ -67,6 +67,18 @@ defmodule TurboXmlTest do
 
   end
 
+  test "xml handle integer" do
+    xml_bin = node "int_number", int: 1 do end
+      |> :erlang.iolist_to_binary()
+    assert xml_bin === "<int_number int=\"1\"></int_number>"
+  end
+
+  test "xml handle decimal" do
+    xml_bin = node "dec_number", dec: 10.5 do end
+     |> :erlang.iolist_to_binary()
+    assert xml_bin === "<dec_number dec=\"10.5\"></dec_number>"
+  end
+
   test "xml valid name1", do: (node "axml" do end)
   test "xml valid name2", do: (node "_xml" do end)
   test "xml valid name3", do: (node "_1" do end)
