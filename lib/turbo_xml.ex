@@ -1,20 +1,17 @@
 defmodule TurboXml do
   @moduledoc false
-
+  
   defmacro doc(do: body) do
     quote do
       ["<?xml version=\"1.0\"?>", unquote(body)]
     end
   end
 
-  defmacro node(name, do: body) do
-    node_inner(name, [], body)
-  end
-
-  defmacro node(name, attrs, do: body) do
-    node_inner(name, attrs, body)
-  end
-
+  defmacro node(name, attrs \\ [])
+  defmacro node(name, do: body), do: node_inner(name, [], body)
+  defmacro node(name, attrs), do: node_inner(name, attrs, :self_closing)
+  defmacro node(name, attrs, do: body), do: node_inner(name, attrs, body)
+  
   def write_node_attrs([]), do: []
   def write_node_attrs([{key, val} | rest]) do
     [" ", normalize_name(key), "=\"", val |> to_string() |> string_escape(), "\"" | write_node_attrs(rest)]
@@ -29,9 +26,14 @@ defmodule TurboXml do
       name = TurboXml.normalize_name(unquote(name))
         |> TurboXml.validate_tag_prefix()
         |> TurboXml.validate_tag()
-
       pass_attrs = TurboXml.write_node_attrs(unquote(attrs))
-      ["<", name, pass_attrs, ">", TurboXml.write_node_body(unquote(body)), "</", name, ">"]
+      body_passed = unquote(body)
+      body_actual =
+        case body_passed do
+          :self_closing -> "/>"
+          _ -> [">", TurboXml.write_node_body(body_passed), "</", name, ">"]
+        end
+      ["<", name, pass_attrs, body_actual]
     end
   end
 
