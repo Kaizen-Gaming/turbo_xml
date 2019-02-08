@@ -1,6 +1,6 @@
 defmodule TurboXml do
   @moduledoc false
-  
+
   defmacro doc(do: body) do
     quote do
       ["<?xml version=\"1.0\"?>", unquote(body)]
@@ -11,7 +11,7 @@ defmodule TurboXml do
   defmacro ele(name, do: body), do: ele_inner(name, [], body)
   defmacro ele(name, attrs), do: ele_inner(name, attrs, :self_closing)
   defmacro ele(name, attrs, do: body), do: ele_inner(name, attrs, body)
-  
+
   def write_ele_attrs([]), do: []
   def write_ele_attrs([{key, val} | rest]) do
     [" ", normalize_name(key), "=\"", val |> to_string() |> string_escape(), "\"" | write_ele_attrs(rest)]
@@ -21,20 +21,33 @@ defmodule TurboXml do
   def write_ele_body(body) when is_binary(body), do: string_escape(body)
   def write_ele_body(body), do: body
 
-  defp ele_inner(name, attrs, body) do
+
+  defp ele_inner(name, attrs, :self_closing) do
     quote do
-      name = TurboXml.normalize_name(unquote(name))
-        |> TurboXml.validate_tag_prefix()
-        |> TurboXml.validate_tag()
-      pass_attrs = TurboXml.write_ele_attrs(unquote(attrs))
-      body_passed = unquote(body)
-      body_actual =
-        case body_passed do
-          :self_closing -> "/>"
-          _ -> [">", TurboXml.write_ele_body(body_passed), "</", name, ">"]
-        end
+      {name, pass_attrs} = TurboXml.do_ele_inner(unquote(name), unquote(attrs))
+      body_actual = "/>"
       ["<", name, pass_attrs, body_actual]
     end
+  end
+
+  defp ele_inner(name, attrs, body) do
+    quote do
+      {name, pass_attrs} = TurboXml.do_ele_inner(unquote(name), unquote(attrs))
+      body_passed = unquote(body)
+      body_actual = [">", TurboXml.write_ele_body(body_passed), "</", name, ">"]
+      ["<", name, pass_attrs, body_actual]
+    end
+  end
+
+  def do_ele_inner(name, attrs) do
+    name =
+      TurboXml.normalize_name(name)
+      |> TurboXml.validate_tag_prefix()
+      |> TurboXml.validate_tag()
+
+    pass_attrs = TurboXml.write_ele_attrs(attrs)
+
+    {name, pass_attrs}
   end
 
   def normalize_name(name) when is_binary(name), do: name
