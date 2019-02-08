@@ -2,12 +2,14 @@ defmodule TurboXml.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :turbo_xml,
-     version: "0.1.0",
-     elixir: "~> 1.4-rc",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps()]
+    [
+      app: :turbo_xml,
+      version: "0.1.1",
+      elixir: "~> 1.7",
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      deps: deps()
+    ]
   end
 
   # Configuration for the OTP application
@@ -28,6 +30,8 @@ defmodule TurboXml.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:dialyxir, "~> 1.0.0-rc.4", only: [:dev], runtime: false}
+    ]
   end
 end
